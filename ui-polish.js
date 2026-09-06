@@ -7,6 +7,7 @@
     #ps-bg-a.visible,#ps-bg-b.visible{opacity:.48}
     #ps-bg-tint{position:fixed;inset:0;z-index:-1;background:rgba(255,248,239,.2);pointer-events:none}
     .category-card>span:not(.category-icon),.theme-card>span{display:none}
+    .category-card[data-category="quiet-time"],.category-card[data-category="outside"],.category-card[data-category="mealtime"],.category-card[data-category="party"],.category-card[data-category="calm-down"],.category-card[data-category="creative-time"]{display:none}
     .category-card,.theme-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
     .view{animation:ps-fade .22s ease both}
     @keyframes ps-fade{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
@@ -22,7 +23,7 @@
     const urls=[...new Set(candidates||[])];
     let i=0;
     const tryNext=()=>{
-      if(i>=urls.length){return;}
+      if(i>=urls.length)return;
       const url=urls[i++],img=new Image();
       img.onload=()=>{
         const next=active===a?b:a;
@@ -59,9 +60,10 @@
   }
 
   window.addEventListener('DOMContentLoaded',()=>{
-    document.querySelector('#homeButton')?.addEventListener('click',e=>{e.preventDefault();navigate('home',true)});
-    document.querySelector('#musicButton')?.addEventListener('click',e=>{e.preventDefault();navigate('music',true)});
-    document.querySelector('#brandHome')?.addEventListener('click',e=>{e.preventDefault();navigate('home',true)});
+    const home=document.querySelector('#homeButton'),music=document.querySelector('#musicButton'),brand=document.querySelector('#brandHome');
+    if(home)home.onclick=e=>{e.preventDefault();navigate('home',true)};
+    if(music)music.onclick=e=>{e.preventDefault();navigate('music',true)};
+    if(brand)brand.onclick=e=>{e.preventDefault();navigate('home',true)};
     window.addEventListener('popstate',()=>navigate(page(),false));
     navigate(page(),false);
   });
