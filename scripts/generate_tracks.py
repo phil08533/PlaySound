@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Build tracks.json from the music/ folder.
+"""Build track manifests from the music/ folder.
 
 Drop an audio file and optional same-named artwork into music/category/theme/.
-No code or manifest editing is required.
+Featured music is managed separately in music/featured/.
 """
 from pathlib import Path
 import json,re
@@ -10,6 +10,7 @@ import json,re
 ROOT=Path(__file__).resolve().parents[1]
 MUSIC=ROOT/'music'
 OUT=ROOT/'tracks.json'
+FEATURED_OUT=ROOT/'featured.json'
 AUDIO={'.mp3','.m4a','.ogg','.wav','.aac','.flac'}
 ART={'.jpg','.jpeg','.png','.webp'}
 
@@ -18,31 +19,34 @@ def title_from_filename(path):
     name=name.replace('_',' ').replace('-',' ')
     return re.sub(r'\s+',' ',name).strip().title()
 
+def artwork_for(audio):
+    for ext in ART:
+        candidate=audio.with_suffix(ext)
+        if candidate.exists():
+            return candidate.relative_to(ROOT).as_posix()
+    return None
+
+def track_for(audio, category=None, theme=None):
+    rel=audio.relative_to(ROOT)
+    parts=rel.parts
+    category=category or (parts[1] if len(parts)>2 else 'uncategorized')
+    theme=theme or (parts[2] if len(parts)>3 else 'general')
+    return {'id':rel.as_posix(),'title':title_from_filename(audio),'category':category,'theme':theme,'audio':rel.as_posix(),'artwork':artwork_for(audio)}
+
 def main():
     tracks=[]
+    featured=[]
     if MUSIC.exists():
         for audio in sorted(MUSIC.rglob('*')):
             if not audio.is_file() or audio.suffix.lower() not in AUDIO: continue
             rel=audio.relative_to(MUSIC)
-            parts=rel.parts
-            category=parts[0] if len(parts)>1 else 'uncategorized'
-            theme=parts[1] if len(parts)>2 else 'general'
-            artwork=None
-            for ext in ART:
-                candidate=audio.with_suffix(ext)
-                if candidate.exists():
-                    artwork=candidate.relative_to(ROOT).as_posix()
-                    break
-            audio_path=audio.relative_to(ROOT).as_posix()
-            tracks.append({
-                'id':audio_path,
-                'title':title_from_filename(audio),
-                'category':category,
-                'theme':theme,
-                'audio':audio_path,
-                'artwork':artwork,
-            })
+            if rel.parts and rel.parts[0]=='featured':
+                featured.append(track_for(audio,'featured','featured'))
+                continue
+            tracks.append(track_for(audio))
     OUT.write_text(json.dumps(tracks,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+    FEATURED_OUT.write_text(json.dumps(featured,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     print(f'Generated {OUT} with {len(tracks)} track(s).')
+    print(f'Generated {FEATURED_OUT} with {len(featured)} featured track(s).')
 
 if __name__=='__main__': main()
