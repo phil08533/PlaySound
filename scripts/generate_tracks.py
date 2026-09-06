@@ -30,7 +30,6 @@ def extract_id3_cover(audio):
             flags=header[5]
             size=sum((b&0x7f)<<(7*i) for i,b in enumerate(header[6:10]))
             if flags & 0x40:
-                # Extended header: skip its declared size (syncsafe for v2.4).
                 ext=f.read(4)
                 if len(ext)<4:return None
                 ext_size=int.from_bytes(ext,'big') if version==3 else sum((b&0x7f)<<(7*i) for i,b in enumerate(ext))
@@ -39,34 +38,22 @@ def extract_id3_cover(audio):
         pos=0
         while pos+10<=len(data):
             fid=data[pos:pos+4]
-            if fid in (b'\x00\x00\x00\x00',b'3DI3'): break
+            if fid==b'\x00\x00\x00\x00': break
             raw_size=data[pos+4:pos+8]
-            if version==4:
-                frame_size=sum((b&0x7f)<<(7*i) for i,b in enumerate(raw_size))
-            else:
-                frame_size=int.from_bytes(raw_size,'big')
+            frame_size=sum((b&0x7f)<<(7*i) for i,b in enumerate(raw_size)) if version==4 else int.from_bytes(raw_size,'big')
             if frame_size<=0 or pos+10+frame_size>len(data): break
             frame=data[pos+10:pos+10+frame_size]
             if fid==b'APIC' and len(frame)>=4:
-                enc=frame[0]
-                p=1
-                end=frame.find(b'\x00',p)
+                enc=frame[0]; p=1; end=frame.find(b'\x00',p)
                 if end<0: break
-                mime=frame[p:end].decode('latin1','ignore') or 'image/jpeg'
-                p=end+1
+                mime=frame[p:end].decode('latin1','ignore') or 'image/jpeg'; p=end+1
                 if p>=len(frame): break
-                p+=1 # picture type
-                # Description terminator depends on text encoding.
+                p+=1
                 if enc in (1,2):
-                    term=b'\x00\x00'
-                    d=frame.find(term,p)
-                    p=(d+2 if d>=0 else p)
+                    d=frame.find(b'\x00\x00',p); p=d+2 if d>=0 else p
                 else:
-                    d=frame.find(b'\x00',p)
-                    p=(d+1 if d>=0 else p)
-                ext='.jpg'
-                if 'png' in mime: ext='.png'
-                elif 'webp' in mime: ext='.webp'
+                    d=frame.find(b'\x00',p); p=d+1 if d>=0 else p
+                ext='.png' if 'png' in mime else '.webp' if 'webp' in mime else '.jpg'
                 return frame[p:],ext
             pos+=10+frame_size
     except Exception as exc:
@@ -76,8 +63,7 @@ def extract_id3_cover(audio):
 def artwork_for(audio):
     for ext in ART:
         candidate=audio.with_suffix(ext)
-        if candidate.exists():
-            return candidate.relative_to(ROOT).as_posix()
+        if candidate.exists(): return candidate.relative_to(ROOT).as_posix()
     if audio.suffix.lower()=='.mp3':
         result=extract_id3_cover(audio)
         if result:
@@ -90,23 +76,19 @@ def artwork_for(audio):
     return None
 
 def track_for(audio, category=None, theme=None):
-    rel=audio.relative_to(ROOT)
-    parts=rel.parts
+    rel=audio.relative_to(ROOT); parts=rel.parts
     category=category or (parts[1] if len(parts)>3 else 'uncategorized')
     theme=theme or (parts[2] if len(parts)>3 else 'general')
     return {'id':rel.as_posix(),'title':title_from_filename(audio),'category':category,'theme':theme,'audio':rel.as_posix(),'artwork':artwork_for(audio)}
 
 def main():
-    tracks=[]
-    featured=[]
+    tracks=[]; featured=[]
     if MUSIC.exists():
         for audio in sorted(MUSIC.rglob('*')):
             if not audio.is_file() or audio.suffix.lower() not in AUDIO: continue
             rel=audio.relative_to(MUSIC)
-            if rel.parts and rel.parts[0]=='featured':
-                featured.append(track_for(audio,'featured','featured'))
-                continue
-            tracks.append(track_for(audio))
+            if rel.parts and rel.parts[0]=='featured': featured.append(track_for(audio,'featured','featured'))
+            else: tracks.append(track_for(audio))
     OUT.write_text(json.dumps(tracks,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     FEATURED_OUT.write_text(json.dumps(featured,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     print(f'Generated {OUT} with {len(tracks)} track(s).')
