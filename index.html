@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f4ed">
+  <meta name="description" content="Simple music for play, chores, sleep, rides, and quiet time.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <title>PlaySound</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="PlaySound home"><span class="brand-mark">♪</span><span>PlaySound</span></a>
+      <button id="favoritesButton" class="ghost-button" type="button" aria-label="Show favorites">♡ <span>Favorites</span></button>
+    </header>
+
+    <section id="homeView" class="view active">
+      <div class="hero">
+        <p class="eyebrow">Music for everyday moments</p>
+        <h1>What are we doing?</h1>
+        <p>Pick a moment. Then pick a sound.</p>
+      </div>
+      <div id="categoryGrid" class="category-grid" aria-label="Music categories"></div>
+    </section>
+
+    <section id="detailView" class="view" hidden>
+      <button id="backButton" class="back-button" type="button">← Back</button>
+      <div class="detail-heading">
+        <p id="detailEyebrow" class="eyebrow"></p>
+        <h2 id="detailTitle"></h2>
+        <p id="detailDescription"></p>
+      </div>
+      <div id="themeGrid" class="theme-grid"></div>
+    </section>
+
+    <section id="tracksView" class="view" hidden>
+      <button id="tracksBackButton" class="back-button" type="button">← Back</button>
+      <div class="tracks-heading">
+        <div>
+          <p id="tracksEyebrow" class="eyebrow"></p>
+          <h2 id="tracksTitle"></h2>
+        </div>
+        <button id="surpriseButton" class="secondary-button" type="button">↻ Surprise me</button>
+      </div>
+      <div id="trackList" class="track-list"></div>
+    </section>
+
+    <section id="favoritesView" class="view" hidden>
+      <button id="favoritesBackButton" class="back-button" type="button">← Back</button>
+      <div class="detail-heading">
+        <p class="eyebrow">Saved locally</p>
+        <h2>Favorites</h2>
+        <p>Your favorites stay on this device. No account needed.</p>
+      </div>
+      <div id="favoriteList" class="track-list"></div>
+    </section>
+  </main>
+
+  <footer id="player" class="player" aria-label="Music player">
+    <div class="player-art"><img id="playerArtwork" alt="" hidden><span id="playerNote">♪</span></div>
+    <div class="player-main">
+      <div class="now-playing"><span>NOW PLAYING</span><strong id="playerTitle">Choose some music</strong></div>
+      <input id="progress" class="progress" type="range" min="0" max="100" value="0" step="0.1" aria-label="Playback position">
+      <div class="player-time"><span id="currentTime">0:00</span><span id="duration">0:00</span></div>
+    </div>
+    <div class="player-controls">
+      <button id="shuffleButton" class="icon-button" type="button" aria-label="Shuffle">⤨</button>
+      <button id="previousButton" class="icon-button" type="button" aria-label="Previous">◀</button>
+      <button id="playButton" class="play-button" type="button" aria-label="Play">▶</button>
+      <button id="nextButton" class="icon-button" type="button" aria-label="Next">▶</button>
+      <label class="volume"><span>🔊</span><input id="volume" type="range" min="0" max="1" value="0.8" step="0.01" aria-label="Volume"></label>
+    </div>
+  </footer>
+
+  <audio id="audio" preload="metadata"></audio>
+  <script src="app.js"></script>
+</body>
+</html>
