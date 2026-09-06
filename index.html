@@ -8,12 +8,15 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <title>PlaySound</title>
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <a id="brandHome" class="brand" href="?page=home" aria-label="PlaySound home"><span class="brand-mark">P<span>l</span><i>a</i>y</span><strong>PlaySound</strong></a>
+      <a id="brandHome" class="brand" href="?page=home" aria-label="PlaySound home"><span class="brand-mark"><span>Play</span><b>Sound</b></span></a>
       <nav class="main-nav" aria-label="Main navigation"><button id="homeButton" class="nav-button active" type="button">Home</button><button id="musicButton" class="nav-button" type="button">Music</button><button id="favoritesButton" class="nav-button" type="button">♡ Favorites</button></nav>
     </header>
     <section id="homeView" class="view active"><div class="hero"><p class="eyebrow">Music for everyday moments</p><h1>What are we doing?</h1><p>Pick a moment. Then pick a sound.</p></div><section class="featured-section"><div class="section-heading"><div><p class="eyebrow">Fresh from the music room</p><h2>Featured music</h2></div></div><div id="featuredList" class="track-list"></div></section><div class="about-card"><p class="eyebrow">About PlaySound</p><h2>Simple music for little moments.</h2><p>PlaySound is made to make choosing music easy. No accounts, feeds, ads, or endless settings—just choose what you're doing and listen.</p></div></section>
