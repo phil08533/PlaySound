@@ -1,0 +1,11 @@
+{
+  "name":"PlaySound",
+  "short_name":"PlaySound",
+  "description":"Simple music for everyday moments.",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#f7f4ed",
+  "theme_color":"#557c5d",
+  "icons":[{"src":"assets/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
