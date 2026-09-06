@@ -1,9 +1,9 @@
 const CATEGORIES=[
 {id:'play',title:'Play',icon:'✦',description:'Big imagination, little adventures.',themes:[['pirates','Pirates'],['medieval','Medieval'],['space','Space'],['cowboy','Cowboy'],['princess','Princess'],['dinosaurs','Dinosaurs'],['fantasy','Magic / Fantasy'],['adventure','Adventure'],['underwater','Underwater'],['safari','Safari']]},
 {id:'chores',title:'Chores',icon:'⌂',description:'Music that makes getting things done easier.',themes:[['classical','Classical'],['upbeat','Upbeat'],['funky','Funky'],['sing-along','Sing Along'],['energetic','Short & Energetic']]},
-{id:'sleep',title:'Sleep',icon:'☾',description:'Soft sounds for winding down.',themes:[['lullabies','Lullabies'],['classical','Soft Classical'],['rain','Rain'],['ocean','Ocean'],['calm','Calm'],['ambient','Ambient']]},
+{id:'sleep',title:'Sleep',icon:'☾',description:'Soft sounds for winding down.',themes:[['lullabies','Lullabies'],['soft classical','Soft Classical'],['rain','Rain'],['ocean','Ocean'],['calm','Calm'],['ambient','Ambient']]},
 {id:'car-ride',title:'Car Ride',icon:'→',description:'Music for the road, near or far.',themes:[['kids','Kids Songs'],['upbeat','Upbeat'],['sing-along','Sing Along'],['family','Family Favorites'],['calm','Calm Ride']]},
-{id:'quiet-time',title:'Quiet Time',icon:'◌',description:'Gentle music for slower moments.',themes:[['classical','Soft Classical'],['ambient','Ambient'],['piano','Piano'],['nature','Nature'],['gentle-kids','Gentle Kids']]},
+{id:'quiet-time',title:'Quiet Time',icon:'◌',description:'Gentle music for slower moments.',themes:[['soft classical','Soft Classical'],['ambient','Ambient'],['piano','Piano'],['nature','Nature'],['gentle-kids','Gentle Kids']]},
 {id:'creative-time',title:'Creative Time',icon:'✎',description:'A little background for making things.',themes:[['instrumental','Instrumental'],['piano','Piano'],['ambient','Ambient'],['adventure','Adventure']]},
 {id:'outside',title:'Outside',icon:'☀',description:'Sounds for moving, exploring, and playing.',themes:[['upbeat','Upbeat'],['adventure','Adventure'],['nature','Nature'],['kids','Kids Songs']]},
 {id:'mealtime',title:'Mealtime',icon:'♡',description:'Easygoing music for the table.',themes:[['family','Family Favorites'],['kids','Kids Songs'],['calm','Calm'],['sing-along','Sing Along']]},
