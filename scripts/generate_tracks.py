@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build track manifests from the music/ folder.
 
-Drop an audio file and optional same-named artwork into music/category/theme/.
-Featured music is managed separately in music/featured/.
+Drop audio into music/category/theme/. Artwork can be a same-named image
+or embedded in an MP3 as album/cover art. Embedded art is extracted into
+artwork/<audio-relative-path>.jpg during the build.
 """
 from pathlib import Path
 import json,re
@@ -11,6 +12,7 @@ ROOT=Path(__file__).resolve().parents[1]
 MUSIC=ROOT/'music'
 OUT=ROOT/'tracks.json'
 FEATURED_OUT=ROOT/'featured.json'
+ARTWORK_ROOT=ROOT/'artwork'
 AUDIO={'.mp3','.m4a','.ogg','.wav','.aac','.flac'}
 ART={'.jpg','.jpeg','.png','.webp'}
 
@@ -20,16 +22,31 @@ def title_from_filename(path):
     return re.sub(r'\s+',' ',name).strip().title()
 
 def artwork_for(audio):
+    # Prefer an explicitly supplied same-named image in the music folder.
     for ext in ART:
         candidate=audio.with_suffix(ext)
         if candidate.exists():
             return candidate.relative_to(ROOT).as_posix()
+
+    # Suno MP3s often contain their artwork inside the MP3 ID3 tags.
+    if audio.suffix.lower()=='.mp3':
+        try:
+            from mutagen.id3 import ID3
+            tags=ID3(audio)
+            pictures=tags.getall('APIC')
+            if pictures:
+                rel=audio.relative_to(MUSIC)
+                out=ARTWORK_ROOT/rel.with_suffix('.jpg')
+                out.parent.mkdir(parents=True,exist_ok=True)
+                out.write_bytes(pictures[0].data)
+                return out.relative_to(ROOT).as_posix()
+        except Exception as exc:
+            print(f'Could not extract embedded artwork from {audio}: {exc}')
     return None
 
 def track_for(audio, category=None, theme=None):
     rel=audio.relative_to(ROOT)
     parts=rel.parts
-    # Standard layout is music/<category>/<theme>/<audio>.
     category=category or (parts[1] if len(parts)>3 else 'uncategorized')
     theme=theme or (parts[2] if len(parts)>3 else 'general')
     return {'id':rel.as_posix(),'title':title_from_filename(audio),'category':category,'theme':theme,'audio':rel.as_posix(),'artwork':artwork_for(audio)}
