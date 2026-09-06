@@ -1,13 +1,13 @@
-/* PlaySound UI polish: 90% backgrounds, 75% button surfaces, readable text. */
+/* PlaySound UI polish: stronger backgrounds, less faded button surfaces. */
 (function(){
   const css=document.createElement('style');
   css.textContent=`
     :root{--button-text:#75659f!important}
     body:before,body:after,#ps-bg-tint{display:none!important;opacity:1!important}
-    #ps-bg-a,#ps-bg-b{position:fixed;inset:0;z-index:-2;background:center/cover no-repeat;opacity:.9!important;transition:none!important;pointer-events:none}
-    #ps-bg-a.visible,#ps-bg-b.visible{opacity:.9!important}
+    #ps-bg-a,#ps-bg-b{position:fixed;inset:0;z-index:-2;background:center/cover no-repeat;opacity:1!important;transition:none!important;pointer-events:none}
+    #ps-bg-a.visible,#ps-bg-b.visible{opacity:1!important}
     .view,.category-card,.theme-card{animation:none!important;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important;opacity:1!important}
-    .category-card,.theme-card{background:rgba(255,255,255,.75)!important}
+    .category-card,.theme-card{background:rgba(255,255,255,.9)!important}
     .category-card:before,.theme-card:before{opacity:.3!important}
     .category-card strong,.theme-card strong,.nav-button,.back-button,.secondary-button,.small-button{color:#75659f!important;opacity:1!important;text-shadow:0 1px 0 rgba(255,255,255,.7)}
     .nav-button:hover,.nav-button.active,.back-button:hover,.small-button:hover{color:#66548f!important}
