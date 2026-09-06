@@ -1,0 +1,50 @@
+const CATEGORIES=[
+{id:'play',title:'Play',icon:'✦',description:'Big imagination, little adventures.',themes:[['pirates','Pirates'],['medieval','Medieval'],['space','Space'],['cowboy','Cowboy'],['princess','Princess'],['dinosaurs','Dinosaurs'],['fantasy','Magic / Fantasy'],['adventure','Adventure'],['underwater','Underwater'],['safari','Safari']]},
+{id:'chores',title:'Chores',icon:'⌂',description:'Music that makes getting things done easier.',themes:[['classical','Classical'],['upbeat','Upbeat'],['funky','Funky'],['sing-along','Sing Along'],['energetic','Short & Energetic']]},
+{id:'sleep',title:'Sleep',icon:'☾',description:'Soft sounds for winding down.',themes:[['lullabies','Lullabies'],['classical','Soft Classical'],['rain','Rain'],['ocean','Ocean'],['calm','Calm'],['ambient','Ambient']]},
+{id:'car-ride',title:'Car Ride',icon:'→',description:'Music for the road, near or far.',themes:[['kids','Kids Songs'],['upbeat','Upbeat'],['sing-along','Sing Along'],['family','Family Favorites'],['calm','Calm Ride']]},
+{id:'quiet-time',title:'Quiet Time',icon:'◌',description:'Gentle music for slower moments.',themes:[['classical','Soft Classical'],['ambient','Ambient'],['piano','Piano'],['nature','Nature'],['gentle-kids','Gentle Kids']]},
+{id:'creative-time',title:'Creative Time',icon:'✎',description:'A little background for making things.',themes:[['instrumental','Instrumental'],['piano','Piano'],['ambient','Ambient'],['adventure','Adventure']]},
+{id:'outside',title:'Outside',icon:'☀',description:'Sounds for moving, exploring, and playing.',themes:[['upbeat','Upbeat'],['adventure','Adventure'],['nature','Nature'],['kids','Kids Songs']]},
+{id:'mealtime',title:'Mealtime',icon:'♡',description:'Easygoing music for the table.',themes:[['family','Family Favorites'],['kids','Kids Songs'],['calm','Calm'],['sing-along','Sing Along']]},
+{id:'party',title:'Party',icon:'★',description:'Fun music for a little celebration.',themes:[['upbeat','Upbeat'],['kids','Kids Songs'],['sing-along','Sing Along'],['funky','Funky']]},
+{id:'calm-down',title:'Calm Down',icon:'○',description:'A softer place to land.',themes:[['calm','Calm'],['piano','Piano'],['rain','Rain'],['ocean','Ocean'],['ambient','Ambient']]}
+];
+
+const $=s=>document.querySelector(s);const audio=$('#audio');
+let tracks=[],currentIndex=-1,currentCategory=null,currentTheme=null,queue=[],favorites=new Set(JSON.parse(localStorage.getItem('playsound-favorites')||'[]')),shuffle=false;
+const pretty=s=>s.replace(/[-_]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+const categoryById=id=>CATEGORIES.find(c=>c.id===id);
+const pathFor=(category,theme)=>`music/${category}/${theme}/`;
+
+function show(id){document.querySelectorAll('.view').forEach(v=>{v.hidden=v.id!==id;v.classList.toggle('active',v.id===id)});window.scrollTo({top:0,behavior:'smooth'});}
+function renderCategories(){
+ $('#categoryGrid').innerHTML=CATEGORIES.map(c=>`<button class="category-card" data-category="${c.id}"><span class="category-icon">${c.icon}</span><strong>${c.title}</strong><span>${c.description}</span></button>`).join('');
+ document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>openCategory(b.dataset.category));
+}
+function openCategory(id){currentCategory=id;const c=categoryById(id);$('#detailEyebrow').textContent='Choose a sound';$('#detailTitle').textContent=c.title;$('#detailDescription').textContent=c.description;$('#themeGrid').innerHTML=c.themes.map(([key,label])=>`<button class="theme-card" data-theme="${key}"><strong>${label}</strong><span>Browse ${label.toLowerCase()}</span></button>`).join('');document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>openTheme(id,b.dataset.theme));show('detailView');}
+async function openTheme(category,theme){currentCategory=category;currentTheme=theme;const c=categoryById(category);const label=c.themes.find(x=>x[0]===theme)?.[1]||pretty(theme);queue=tracks.filter(t=>t.category===category&&t.theme===theme);if(!queue.length) queue=tracks.filter(t=>t.category===category&&t.theme==='general');$('#tracksEyebrow').textContent=c.title;$('#tracksTitle').textContent=label;renderTracks();show('tracksView');}
+function renderTracks(){const list=$('#trackList');if(!queue.length){list.innerHTML=`<div class="empty"><strong>No music here yet.</strong><span>Drop an MP3 and matching artwork into <b>music/${currentCategory}/${currentTheme}/</b>, push it to GitHub, and the app will find it automatically.</span></div>`;return}list.innerHTML=queue.map((t,i)=>trackHTML(t,i)).join('');bindTrackButtons();}
+function trackHTML(t,i){const fav=favorites.has(t.id);return `<article class="track"><div class="track-art">${t.artwork?`<img class="track-art" src="${t.artwork}" alt="" loading="lazy">`:'♪'}</div><div class="track-info"><strong>${escapeHtml(t.title)}</strong><span>${pretty(t.theme)}</span></div><div class="track-actions"><button class="small-button" data-play="${i}" aria-label="Play ${escapeHtml(t.title)}">▶</button><button class="small-button" data-favorite="${t.id}" aria-label="${fav?'Remove from':'Add to'} favorites">${fav?'♥':'♡'}</button></div></article>`}
+function bindTrackButtons(){document.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>playQueue(Number(b.dataset.play)));document.querySelectorAll('[data-favorite]').forEach(b=>b.onclick=()=>toggleFavorite(b.dataset.favorite));}
+function playQueue(i){if(!queue.length)return;currentIndex=i;loadTrack(queue[currentIndex],true);}
+function loadTrack(t,autoplay=false){audio.src=t.audio;$('#playerTitle').textContent=t.title;$('#playerArtwork').hidden=!t.artwork;$('#playerArtwork').src=t.artwork||'';if(autoplay)audio.play().catch(()=>{});updatePlayButton();}
+function next(){if(!queue.length)return;currentIndex=shuffle?Math.floor(Math.random()*queue.length):(currentIndex+1)%queue.length;loadTrack(queue[currentIndex],true)}
+function previous(){if(!queue.length)return;currentIndex=(currentIndex-1+queue.length)%queue.length;loadTrack(queue[currentIndex],true)}
+function toggleFavorite(id){if(favorites.has(id))favorites.delete(id);else favorites.add(id);localStorage.setItem('playsound-favorites',JSON.stringify([...favorites]));if($('#favoritesView').hidden===false)renderFavorites();renderTracks();}
+function renderFavorites(){const list=$('#favoriteList'),items=tracks.filter(t=>favorites.has(t.id));if(!items.length){list.innerHTML='<div class="empty"><strong>No favorites yet.</strong><span>Tap ♡ next to any song to save it here.</span></div>';return}list.innerHTML=items.map(t=>trackHTML(t,tracks.indexOf(t))).join('');document.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>{queue=items;playQueue(Number(b.dataset.play))});bindTrackButtons();}
+function updatePlayButton(){$('#playButton').textContent=audio.paused?'▶':'Ⅱ';$('#playButton').setAttribute('aria-label',audio.paused?'Play':'Pause')}
+function formatTime(s){if(!Number.isFinite(s))return'0:00';return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`}
+function escapeHtml(s){return s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+
+async function loadManifest(){try{const res=await fetch('tracks.json',{cache:'no-store'});if(!res.ok)throw new Error();tracks=await res.json();}catch{tracks=[]}renderCategories();}
+$('#playButton').onclick=()=>{if(!audio.src&&queue.length)playQueue(0);else if(audio.paused)audio.play().catch(()=>{});else audio.pause()};
+$('#nextButton').onclick=next;$('#previousButton').onclick=previous;$('#shuffleButton').onclick=()=>{shuffle=!shuffle;$('#shuffleButton').style.opacity=shuffle?1:.5};$('#surpriseButton').onclick=()=>{if(queue.length)playQueue(Math.floor(Math.random()*queue.length))};
+$('#volume').oninput=e=>audio.volume=Number(e.target.value);audio.volume=.8;
+$('#progress').oninput=e=>{if(audio.duration)audio.currentTime=audio.duration*(Number(e.target.value)/100)};
+audio.ontimeupdate=()=>{$('#progress').value=audio.duration?audio.currentTime/audio.duration*100:0;$('#currentTime').textContent=formatTime(audio.currentTime)};
+audio.onloadedmetadata=()=>$('#duration').textContent=formatTime(audio.duration);audio.onplay=updatePlayButton;audio.onpause=updatePlayButton;audio.onended=next;
+$('#backButton').onclick=()=>show('homeView');$('#tracksBackButton').onclick=()=>openCategory(currentCategory);$('#favoritesBackButton').onclick=()=>show('homeView');$('#favoritesButton').onclick=()=>{renderFavorites();show('favoritesView')};
+window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();$('#playButton').click()}if(e.key==='ArrowRight'&&e.target.tagName!=='INPUT')next();if(e.key==='ArrowLeft'&&e.target.tagName!=='INPUT')previous()});
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+loadManifest();
