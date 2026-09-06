@@ -29,7 +29,8 @@ def artwork_for(audio):
 def track_for(audio, category=None, theme=None):
     rel=audio.relative_to(ROOT)
     parts=rel.parts
-    category=category or (parts[1] if len(parts)>2 else 'uncategorized')
+    # Standard layout is music/<category>/<theme>/<audio>.
+    category=category or (parts[1] if len(parts)>3 else 'uncategorized')
     theme=theme or (parts[2] if len(parts)>3 else 'general')
     return {'id':rel.as_posix(),'title':title_from_filename(audio),'category':category,'theme':theme,'audio':rel.as_posix(),'artwork':artwork_for(audio)}
 
