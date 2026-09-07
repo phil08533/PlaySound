@@ -1,7 +1,7 @@
 /* PlaySound UI polish: stronger backgrounds, less faded button surfaces. */
 (function(){
-  const css=document.createElement('style');
-  css.textContent=`
+  /* Legacy visual overrides kept for older cached copies. New styling lives in style.css. */
+  /*
     :root{--button-text:#75659f!important}
     body:before,body:after,#ps-bg-tint{display:none!important;opacity:1!important}
     #ps-bg-a,#ps-bg-b{position:fixed;inset:0;z-index:-2;background:center/cover no-repeat;opacity:1!important;transition:none!important;pointer-events:none}
@@ -15,23 +15,14 @@
     .brand-mark b{font-weight:800}
     .category-card>span:not(.category-icon),.theme-card>span{display:none}
     .category-card[data-category="quiet-time"],.category-card[data-category="outside"],.category-card[data-category="mealtime"],.category-card[data-category="party"],.category-card[data-category="calm-down"],.category-card[data-category="creative-time"]{display:none}
-  `;
-  document.head.appendChild(css);
-  const a=document.createElement('div'),b=document.createElement('div');
-  a.id='ps-bg-a';b.id='ps-bg-b';document.body.prepend(b,a);
-  let active=a;
-  window.setBackgroundCandidates=function(candidates){
-    const urls=[...new Set(candidates||[])];let i=0;
-    const tryNext=()=>{if(i>=urls.length)return;const url=urls[i++],img=new Image();img.onload=()=>{const next=active===a?b:a;next.style.backgroundImage=`url("${url}")`;next.classList.add('visible');active.classList.remove('visible');active=next};img.onerror=tryNext;img.src=url};
-    tryNext();
-  };
+  */
   const params=()=>new URLSearchParams(location.search);
-  function page(){return params().get('page')==='music'?'music':'home';}
+  function page(){return params().get('page')==='about'?'about':'home';}
   function navigate(target,push){
-    if(push)history.pushState({page:target},'',target==='music'?'?page=music':'?page=home');
-    if(target==='music'){if(typeof setPageBackground==='function')setPageBackground('music');if(typeof renderMusicPage==='function')renderMusicPage();showView('musicView')}
+    if(push)history.pushState({page:target},'',target==='about'?'?page=about':'?page=home');
+    if(target==='about'){if(typeof setPageBackground==='function')setPageBackground('home');showView('musicView')}
     else{if(typeof setPageBackground==='function')setPageBackground('home');showView('homeView')}
   }
   function showView(id){document.querySelectorAll('.view').forEach(v=>{v.hidden=v.id!==id;v.classList.toggle('active',v.id===id)});document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active'));if(id==='homeView')document.querySelector('#homeButton')?.classList.add('active');if(id==='musicView')document.querySelector('#musicButton')?.classList.add('active');window.scrollTo({top:0,behavior:'auto'});}
-  window.addEventListener('DOMContentLoaded',()=>{const home=document.querySelector('#homeButton'),music=document.querySelector('#musicButton'),brand=document.querySelector('#brandHome');if(home)home.onclick=e=>{e.preventDefault();navigate('home',true)};if(music)music.onclick=e=>{e.preventDefault();navigate('music',true)};if(brand)brand.onclick=e=>{e.preventDefault();navigate('home',true)};window.addEventListener('popstate',()=>navigate(page(),false));navigate(page(),false)});
+  window.addEventListener('DOMContentLoaded',()=>{const home=document.querySelector('#homeButton'),about=document.querySelector('#musicButton'),brand=document.querySelector('#brandHome');if(home)home.onclick=e=>{e.preventDefault();navigate('home',true)};if(about)about.onclick=e=>{e.preventDefault();navigate('about',true)};if(brand)brand.onclick=e=>{e.preventDefault();navigate('home',true)};window.addEventListener('popstate',()=>navigate(page(),false));navigate(page(),false)});
 })();
