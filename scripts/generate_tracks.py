@@ -11,7 +11,9 @@ ROOT=Path(__file__).resolve().parents[1]
 MUSIC=ROOT/'music'
 OUT=ROOT/'tracks.json'
 FEATURED_OUT=ROOT/'featured.json'
+ALBUM_ART_OUT=ROOT/'album-art.json'
 ARTWORK_ROOT=ROOT/'artwork'
+SHARED_ALBUM_ART=ROOT/'assets'/'album-art'
 AUDIO={'.mp3','.m4a','.ogg','.wav','.aac','.flac'}
 ART={'.jpg','.jpeg','.png','.webp'}
 
@@ -91,7 +93,12 @@ def main():
             else: tracks.append(track_for(audio))
     OUT.write_text(json.dumps(tracks,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     FEATURED_OUT.write_text(json.dumps(featured,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+    shared_art=[]
+    if SHARED_ALBUM_ART.exists():
+        shared_art=sorted(image.relative_to(ROOT).as_posix() for image in SHARED_ALBUM_ART.rglob('*') if image.is_file() and image.suffix.lower() in ART)
+    ALBUM_ART_OUT.write_text(json.dumps(shared_art,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
     print(f'Generated {OUT} with {len(tracks)} track(s).')
     print(f'Generated {FEATURED_OUT} with {len(featured)} featured track(s).')
+    print(f'Generated {ALBUM_ART_OUT} with {len(shared_art)} shared album-art image(s).')
 
 if __name__=='__main__': main()
