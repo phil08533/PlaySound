@@ -17,12 +17,12 @@
     .category-card[data-category="quiet-time"],.category-card[data-category="outside"],.category-card[data-category="mealtime"],.category-card[data-category="party"],.category-card[data-category="calm-down"],.category-card[data-category="creative-time"]{display:none}
   */
   const params=()=>new URLSearchParams(location.search);
-  function page(){return params().get('page')==='music'?'music':'home';}
+  function page(){return params().get('page')==='about'?'about':'home';}
   function navigate(target,push){
-    if(push)history.pushState({page:target},'',target==='music'?'?page=music':'?page=home');
-    if(target==='music'){if(typeof setPageBackground==='function')setPageBackground('music');if(typeof renderMusicPage==='function')renderMusicPage();showView('musicView')}
+    if(push)history.pushState({page:target},'',target==='about'?'?page=about':'?page=home');
+    if(target==='about'){if(typeof setPageBackground==='function')setPageBackground('home');showView('musicView')}
     else{if(typeof setPageBackground==='function')setPageBackground('home');showView('homeView')}
   }
   function showView(id){document.querySelectorAll('.view').forEach(v=>{v.hidden=v.id!==id;v.classList.toggle('active',v.id===id)});document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active'));if(id==='homeView')document.querySelector('#homeButton')?.classList.add('active');if(id==='musicView')document.querySelector('#musicButton')?.classList.add('active');window.scrollTo({top:0,behavior:'auto'});}
-  window.addEventListener('DOMContentLoaded',()=>{const home=document.querySelector('#homeButton'),music=document.querySelector('#musicButton'),brand=document.querySelector('#brandHome');if(home)home.onclick=e=>{e.preventDefault();navigate('home',true)};if(music)music.onclick=e=>{e.preventDefault();navigate('music',true)};if(brand)brand.onclick=e=>{e.preventDefault();navigate('home',true)};window.addEventListener('popstate',()=>navigate(page(),false));navigate(page(),false)});
+  window.addEventListener('DOMContentLoaded',()=>{const home=document.querySelector('#homeButton'),about=document.querySelector('#musicButton'),brand=document.querySelector('#brandHome');if(home)home.onclick=e=>{e.preventDefault();navigate('home',true)};if(about)about.onclick=e=>{e.preventDefault();navigate('about',true)};if(brand)brand.onclick=e=>{e.preventDefault();navigate('home',true)};window.addEventListener('popstate',()=>navigate(page(),false));navigate(page(),false)});
 })();
