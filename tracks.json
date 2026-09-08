@@ -501,7 +501,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Call of the Reef.mp3",
-    "artwork": "artwork/play/pirates/Call of the Reef.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Cannon Cove.mp3",
@@ -509,7 +509,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Cannon Cove.mp3",
-    "artwork": "artwork/play/pirates/Cannon Cove.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Captain Pebble.mp3",
@@ -517,7 +517,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Captain Pebble.mp3",
-    "artwork": "artwork/play/pirates/Captain Pebble.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Hidden Island.mp3",
@@ -525,7 +525,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Hidden Island.mp3",
-    "artwork": "artwork/play/pirates/Hidden Island.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Isle of Treasure.mp3",
@@ -533,7 +533,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Isle of Treasure.mp3",
-    "artwork": "artwork/play/pirates/Isle of Treasure.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/North Winds.mp3",
@@ -541,7 +541,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/North Winds.mp3",
-    "artwork": "artwork/play/pirates/North Winds.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Parrot Pal.mp3",
@@ -549,7 +549,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Parrot Pal.mp3",
-    "artwork": "artwork/play/pirates/Parrot Pal.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Skeleton Crew.mp3",
@@ -557,7 +557,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Skeleton Crew.mp3",
-    "artwork": "artwork/play/pirates/Skeleton Crew.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/The Cannon Blast.mp3",
@@ -565,7 +565,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/The Cannon Blast.mp3",
-    "artwork": "artwork/play/pirates/The Cannon Blast.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/pirates/Treasure Bound.mp3",
@@ -573,7 +573,7 @@
     "category": "play",
     "theme": "pirates",
     "audio": "music/play/pirates/Treasure Bound.mp3",
-    "artwork": "artwork/play/pirates/Treasure Bound.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Castle Parade.mp3",
@@ -581,7 +581,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Castle Parade.mp3",
-    "artwork": "artwork/play/princess/Castle Parade.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Castle of Ice.mp3",
@@ -589,7 +589,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Castle of Ice.mp3",
-    "artwork": "artwork/play/princess/Castle of Ice.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Kingdom of the Moon.mp3",
@@ -597,7 +597,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Kingdom of the Moon.mp3",
-    "artwork": "artwork/play/princess/Kingdom of the Moon.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Moonlit.mp3",
@@ -605,7 +605,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Moonlit.mp3",
-    "artwork": "artwork/play/princess/Moonlit.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Perfecet Dress.mp3",
@@ -613,7 +613,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Perfecet Dress.mp3",
-    "artwork": "artwork/play/princess/Perfecet Dress.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Pinning Ceremony.mp3",
@@ -621,7 +621,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Pinning Ceremony.mp3",
-    "artwork": "artwork/play/princess/Pinning Ceremony.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Raindow Castle.mp3",
@@ -629,7 +629,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Raindow Castle.mp3",
-    "artwork": "artwork/play/princess/Raindow Castle.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Ribbon Crown.mp3",
@@ -637,7 +637,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Ribbon Crown.mp3",
-    "artwork": "artwork/play/princess/Ribbon Crown.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Twilight Princess.mp3",
@@ -645,7 +645,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Twilight Princess.mp3",
-    "artwork": "artwork/play/princess/Twilight Princess.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/princess/Whimsey.mp3",
@@ -653,7 +653,7 @@
     "category": "play",
     "theme": "princess",
     "audio": "music/play/princess/Whimsey.mp3",
-    "artwork": "artwork/play/princess/Whimsey.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Compass North.mp3",
@@ -661,7 +661,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Compass North.mp3",
-    "artwork": "artwork/play/safari/Compass North.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Giraffe.mp3",
@@ -669,7 +669,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Giraffe.mp3",
-    "artwork": "artwork/play/safari/Giraffe.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Jeep Travel.mp3",
@@ -677,7 +677,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Jeep Travel.mp3",
-    "artwork": "artwork/play/safari/Jeep Travel.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Lets Go!.mp3",
@@ -685,7 +685,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Lets Go!.mp3",
-    "artwork": "artwork/play/safari/Lets Go!.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Lion Chase.mp3",
@@ -693,7 +693,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Lion Chase.mp3",
-    "artwork": "artwork/play/safari/Lion Chase.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Lion Cubs.mp3",
@@ -701,7 +701,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Lion Cubs.mp3",
-    "artwork": "artwork/play/safari/Lion Cubs.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Map Maker.mp3",
@@ -709,7 +709,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Map Maker.mp3",
-    "artwork": "artwork/play/safari/Map Maker.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Safari Stan.mp3",
@@ -717,7 +717,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Safari Stan.mp3",
-    "artwork": "artwork/play/safari/Safari Stan.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Sun Over the Savanah.mp3",
@@ -725,7 +725,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Sun Over the Savanah.mp3",
-    "artwork": "artwork/play/safari/Sun Over the Savanah.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/safari/Treasure Chest.mp3",
@@ -733,7 +733,7 @@
     "category": "play",
     "theme": "safari",
     "audio": "music/play/safari/Treasure Chest.mp3",
-    "artwork": "artwork/play/safari/Treasure Chest.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Deep Space.mp3",
@@ -741,7 +741,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Deep Space.mp3",
-    "artwork": "artwork/play/space/Deep Space.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Dust Trails.mp3",
@@ -781,7 +781,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Liftoff.mp3",
-    "artwork": "artwork/play/space/Liftoff.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Orbit.mp3",
@@ -805,7 +805,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Rocket.mp3",
-    "artwork": "artwork/play/space/Rocket.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Space Helmet.mp3",
@@ -813,7 +813,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Space Helmet.mp3",
-    "artwork": "artwork/play/space/Space Helmet.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Space Race.mp3",
@@ -821,7 +821,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Space Race.mp3",
-    "artwork": "artwork/play/space/Space Race.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Star Bound.mp3",
@@ -829,7 +829,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Star Bound.mp3",
-    "artwork": "artwork/play/space/Star Bound.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Star Fall.mp3",
@@ -837,7 +837,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Star Fall.mp3",
-    "artwork": "artwork/play/space/Star Fall.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Star Light.mp3",
@@ -853,7 +853,7 @@
     "category": "play",
     "theme": "space",
     "audio": "music/play/space/Stars Collide.mp3",
-    "artwork": "artwork/play/space/Stars Collide.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/space/Sunshine.mp3",
@@ -885,7 +885,7 @@
     "category": "play",
     "theme": "underwater",
     "audio": "music/play/underwater/Bubbles.mp3",
-    "artwork": "artwork/play/underwater/Bubbles.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/underwater/Flounder.mp3",
@@ -893,7 +893,7 @@
     "category": "play",
     "theme": "underwater",
     "audio": "music/play/underwater/Flounder.mp3",
-    "artwork": "artwork/play/underwater/Flounder.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/underwater/Under the Ocean.mp3",
@@ -901,7 +901,7 @@
     "category": "play",
     "theme": "underwater",
     "audio": "music/play/underwater/Under the Ocean.mp3",
-    "artwork": "artwork/play/underwater/Under the Ocean.jpg"
+    "artwork": null
   },
   {
     "id": "music/play/underwater/Water World.mp3",
@@ -909,7 +909,7 @@
     "category": "play",
     "theme": "underwater",
     "audio": "music/play/underwater/Water World.mp3",
-    "artwork": "artwork/play/underwater/Water World.jpg"
+    "artwork": null
   },
   {
     "id": "music/sleep/Break Me.mp3",

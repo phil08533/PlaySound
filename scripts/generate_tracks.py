@@ -66,15 +66,6 @@ def artwork_for(audio):
     for ext in ART:
         candidate=audio.with_suffix(ext)
         if candidate.exists(): return candidate.relative_to(ROOT).as_posix()
-    if audio.suffix.lower()=='.mp3':
-        result=extract_id3_cover(audio)
-        if result:
-            data,ext=result
-            rel=audio.relative_to(MUSIC)
-            out=ARTWORK_ROOT/rel.with_suffix(ext)
-            out.parent.mkdir(parents=True,exist_ok=True)
-            out.write_bytes(data)
-            return out.relative_to(ROOT).as_posix()
     return None
 
 def track_for(audio, category=None, theme=None):

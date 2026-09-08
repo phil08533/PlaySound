@@ -1,50 +1,496 @@
-const CATEGORIES=[
-{id:'play',title:'Play',icon:'✦',description:'Big imagination, little adventures.',themes:[['pirates','Pirates'],['medieval','Medieval'],['space','Space'],['cowboy','Cowboy'],['princess','Princess'],['dinosaurs','Dinosaurs'],['fantasy','Magic / Fantasy'],['adventure','Adventure'],['underwater','Underwater'],['safari','Safari']]},
-{id:'chores',title:'Chores',icon:'⌂',description:'Music that makes getting things done easier.',themes:[['classical','Classical'],['upbeat','Upbeat'],['funky','Funky'],['sing along','Sing Along'],['short & energetic','Short & Energetic']]},
-{id:'sleep',title:'Sleep',icon:'☾',description:'Soft sounds for winding down.',themes:[['lullabies','Lullabies'],['soft classical','Soft Classical'],['rain','Rain'],['ocean','Ocean'],['calm','Calm'],['ambient','Ambient']]},
-{id:'car-ride',title:'Car Ride',icon:'→',description:'Music for the road, near or far.',themes:[['upbeat','Upbeat'],['sing along','Sing Along'],['family','Family Favorites'],['calm','Calm Ride']]}
+const CATEGORIES = [
+  { id: 'play', title: 'Play', icon: '✦', description: 'Big imagination, little adventures.', themes: [['pirates', 'Pirates'], ['medieval', 'Medieval'], ['space', 'Space'], ['cowboy', 'Cowboy'], ['princess', 'Princess'], ['dinosaurs', 'Dinosaurs'], ['fantasy', 'Magic / Fantasy'], ['adventure', 'Adventure'], ['underwater', 'Underwater'], ['safari', 'Safari']] },
+  { id: 'chores', title: 'Chores', icon: '⌂', description: 'Music that makes getting things done easier.', themes: [['classical', 'Classical'], ['upbeat', 'Upbeat'], ['funky', 'Funky'], ['sing along', 'Sing Along'], ['short & energetic', 'Short & Energetic']] },
+  { id: 'sleep', title: 'Sleep', icon: '☾', description: 'Soft sounds for winding down.', themes: [['lullabies', 'Lullabies'], ['soft classical', 'Soft Classical'], ['rain', 'Rain'], ['ocean', 'Ocean'], ['calm', 'Calm'], ['ambient', 'Ambient']] },
+  { id: 'car-ride', title: 'Car Ride', icon: '→', description: 'Music for the road, near or far.', themes: [['upbeat', 'Upbeat'], ['sing along', 'Sing Along'], ['family', 'Family Favorites'], ['calm', 'Calm Ride']] }
 ];
-const $=s=>document.querySelector(s);const audio=$('#audio');
-let tracks=[],featured=[],albumArt=[],currentIndex=-1,currentCategory=null,currentTheme=null,queue=[],favorites=new Set(JSON.parse(localStorage.getItem('playsound-favorites')||'[]')),shuffle=false,repeat=false;
-const pretty=s=>s.replace(/[-_]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-const categoryById=id=>CATEGORIES.find(c=>c.id===id);
-const filenameVariants=s=>[String(s),String(s).replace(/-/g,' '),String(s).replace(/\s+/g,'-'),String(s).replace(/&/g,'and'),String(s).replace(/&/g,' and ')];
-function assetCandidates(category,theme,type){return [...new Set(filenameVariants(theme).flatMap(v=>[`music/${category}/genre background/${type}/${v}.png`,`music/${category}/genre background/${type}/${v}.jpeg`,`music/${category}/genre background/${v}.png`,`music/${category}/genre background/${v}.jpeg`]))];}
-function websiteBackgroundCandidates(category,theme){return [...new Set(filenameVariants(theme).flatMap(v=>['png','jpeg','jpg','webp'].flatMap(ext=>[`music/${category}/genre background/genre button backgrounds/website background/${v}.${ext}`,`music/${category}/genre background/genre button backgrounds/website backgrounds/${v}.${ext}`,`music/${category}/genre background/website background/${v}.${ext}`,`music/${category}/genre background/website backgrounds/${v}.${ext}`])))];}
-function categoryCandidates(category,type){return [...new Set(filenameVariants(category).flatMap(v=>['png','jpeg','jpg','webp'].map(ext=>`music/${category}/genre background/${type}/${v}.${ext}`)))];}
-function setBackgroundCandidates(candidates){let i=0;const urls=[...new Set(candidates)];const test=()=>{if(i>=urls.length){document.body.classList.remove('theme-background');document.body.style.removeProperty('--site-bg');document.body.style.backgroundImage='none';return}const url=urls[i++],img=new Image();img.onload=()=>{document.body.style.setProperty('--site-bg',`url("${url}")`);document.body.style.backgroundImage=`url("${url}")`;document.body.style.backgroundPosition='center';document.body.style.backgroundSize='cover';document.body.style.backgroundRepeat='no-repeat';document.body.style.backgroundAttachment='fixed';document.body.classList.add('theme-background')};img.onerror=test;img.src=url};test();}
-function setBackground(category,theme){setBackgroundCandidates(websiteBackgroundCandidates(category,theme));}
-function setPageBackground(page){setBackgroundCandidates([`backgrounds/${page}.png`,`./backgrounds/${page}.png`]);}
-function setCategoryBackground(category){setBackgroundCandidates([...categoryCandidates(category,'genre button backgrounds/website background'),...categoryCandidates(category,'genre button backgrounds/website backgrounds'),...categoryCandidates(category,'website background'),...categoryCandidates(category,'website backgrounds')]);}
-function show(id){document.querySelectorAll('.view').forEach(v=>{v.hidden=v.id!==id;v.classList.toggle('active',v.id===id)});document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active'));if(id==='homeView')$('#homeButton').classList.add('active');if(['musicView','detailView','tracksView'].includes(id))$('#musicButton').classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-function buttonStyle(category,theme){const candidates=assetCandidates(category,theme,'genre button backgrounds');return `style="--card-bg:url('${candidates[0]}')" data-bg-candidates="${encodeURIComponent(JSON.stringify(candidates))}"`;}
-function categoryButtonStyle(category){const candidates=categoryCandidates(category,'genre button backgrounds');return `style="--card-bg:url('${candidates[0]}')" data-bg-candidates="${encodeURIComponent(JSON.stringify(candidates))}"`;}
-function bindBackgroundFallbacks(){document.querySelectorAll('[data-bg-candidates]').forEach(el=>{let candidates;try{candidates=JSON.parse(decodeURIComponent(el.dataset.bgCandidates))}catch{return}let i=0;const test=()=>{if(i>=candidates.length)return;const img=new Image();img.onload=()=>el.style.setProperty('--card-bg',`url("${candidates[i]}")`);img.onerror=()=>{i++;test()};img.src=candidates[i]};test()});}
-function renderCategories(target='#categoryGrid',onChoose=openCategory){const el=$(target);if(!el)return;el.innerHTML=CATEGORIES.map(c=>`<button class="category-card" data-category="${c.id}" ${categoryButtonStyle(c.id)}><span class="category-icon">${c.icon}</span><strong>${c.title}</strong><span>${c.description}</span></button>`).join('');bindBackgroundFallbacks();el.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>onChoose(b.dataset.category));}
-function renderMusicPage(){renderCategories('#musicCategoryGrid');}
-function renderHomeCategories(){renderCategories('#homeCategoryGrid',openHomeCategory);}
-function renderFeatured(){const section=$('#featuredSection'),list=$('#featuredList');if(!featured.length){section.hidden=true;list.innerHTML='';return}section.hidden=false;list.innerHTML=featured.map((t,i)=>trackHTML(t,i)).join('');document.querySelectorAll('#featuredList [data-play]').forEach(b=>b.onclick=()=>{queue=featured;playQueue(Number(b.dataset.play))});document.querySelectorAll('#featuredList [data-favorite]').forEach(b=>b.onclick=()=>toggleFavorite(b.dataset.favorite));}
-function openCategory(id){currentCategory=id;const c=categoryById(id);if(!c)return;setCategoryBackground(id);$('#detailEyebrow').textContent='Choose a sound';$('#detailTitle').textContent=c.title;$('#detailDescription').textContent=c.description;$('#themeGrid').innerHTML=c.themes.map(([key,label])=>`<button class="theme-card" data-theme="${key}" ${buttonStyle(id,key)}><strong>${label}</strong><span>Browse ${label.toLowerCase()}</span></button>`).join('');bindBackgroundFallbacks();document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>openTheme(id,b.dataset.theme));show('detailView');}
-function openHomeCategory(id){currentCategory=id;const c=categoryById(id);if(!c)return;setCategoryBackground(id);$('#homeThemeEyebrow').textContent=c.title;$('#homeThemeTitle').textContent='Choose a sound';const section=$('#homeThemeSection');section.hidden=false;$('#homeThemeGrid').innerHTML=c.themes.map(([key,label])=>`<button class="theme-card" data-theme="${key}" ${buttonStyle(id,key)}><strong>${label}</strong><span>Browse ${label.toLowerCase()}</span></button>`).join('');bindBackgroundFallbacks();$('#homeThemeGrid').querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>openTheme(id,b.dataset.theme));section.scrollIntoView({behavior:'smooth',block:'start'});}
-function openTheme(category,theme){currentCategory=category;currentTheme=theme;const c=categoryById(category);const label=c.themes.find(x=>x[0]===theme)?.[1]||pretty(theme);queue=tracks.filter(t=>t.category===category&&t.theme===theme);if(!queue.length)queue=tracks.filter(t=>t.category===category&&t.theme==='general');setBackground(category,theme);$('#tracksEyebrow').textContent=c.title;$('#tracksTitle').textContent=label;renderTracks();show('tracksView');}
-function renderTracks(){const list=$('#trackList');if(!queue.length){list.innerHTML=`<div class="empty"><strong>No music here yet.</strong><span>Drop an MP3 and matching artwork into <b>music/${currentCategory}/${currentTheme}/</b>, push it to GitHub, and the app will find it automatically.</span></div>`;return}list.innerHTML=queue.map((t,i)=>trackHTML(t,i)).join('');bindTrackButtons();}
-function artworkFor(t){if(t.artwork)return t.artwork;if(!albumArt.length)return'';return t._albumArt||(t._albumArt=albumArt[Math.floor(Math.random()*albumArt.length)]);}
-function trackHTML(t,i){const fav=favorites.has(t.id),artwork=artworkFor(t);return `<article class="track"><div class="track-art">${artwork?`<img class="track-art" src="${artwork}" alt="" loading="lazy">`:'♪'}</div><div class="track-info"><strong>${escapeHtml(t.title)}</strong><span>${pretty(t.theme||'featured')}</span></div><div class="track-actions"><button class="small-button" data-play="${i}" aria-label="Play ${escapeHtml(t.title)}">▶</button><button class="small-button" data-favorite="${t.id}" aria-label="${fav?'Remove from':'Add to'} favorites">${fav?'♥':'♡'}</button></div></article>`}
-function bindTrackButtons(){document.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>playQueue(Number(b.dataset.play)));document.querySelectorAll('[data-favorite]').forEach(b=>b.onclick=()=>toggleFavorite(b.dataset.favorite));}
-function playQueue(i){if(!queue.length)return;currentIndex=i;loadTrack(queue[currentIndex],true);}
-function loadTrack(t,autoplay=false){const artwork=artworkFor(t);audio.src=t.audio;$('#playerTitle').textContent=t.title;$('#playerArtwork').hidden=!artwork;$('#playerArtwork').src=artwork||'';if(autoplay)audio.play().catch(()=>{});updatePlayButton();}
-function next(){if(!queue.length)return;if(repeat){loadTrack(queue[currentIndex<0?0:currentIndex],true);return}currentIndex=shuffle?Math.floor(Math.random()*queue.length):(currentIndex+1)%queue.length;loadTrack(queue[currentIndex],true)}
-function previous(){if(!queue.length)return;currentIndex=(currentIndex-1+queue.length)%queue.length;loadTrack(queue[currentIndex],true)}
-function toggleFavorite(id){if(favorites.has(id))favorites.delete(id);else favorites.add(id);localStorage.setItem('playsound-favorites',JSON.stringify([...favorites]));if(!$('#favoritesView').hidden)renderFavorites();renderTracks();renderFeatured();}
-function renderFavorites(){const list=$('#favoriteList'),items=tracks.filter(t=>favorites.has(t.id));if(!items.length){list.innerHTML='<div class="empty"><strong>No favorites yet.</strong><span>Tap ♡ next to any song to save it here.</span></div>';return}list.innerHTML=items.map(t=>trackHTML(t,items.indexOf(t))).join('');document.querySelectorAll('#favoriteList [data-play]').forEach(b=>b.onclick=()=>{queue=items;playQueue(Number(b.dataset.play))});document.querySelectorAll('#favoriteList [data-favorite]').forEach(b=>b.onclick=()=>toggleFavorite(b.dataset.favorite));}
-function updatePlayButton(){$('#playButton').textContent=audio.paused?'▶':'Ⅱ';$('#playButton').setAttribute('aria-label',audio.paused?'Play':'Pause');$('#repeatButton').classList.toggle('active',repeat);$('#repeatButton').textContent=repeat?'↻¹':'↻';}
-function formatTime(s){if(!Number.isFinite(s))return'0:00';return `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`}
-function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-async function loadManifest(){try{const res=await fetch(`tracks.json?v=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error();tracks=await res.json();}catch{tracks=[]}try{const res=await fetch(`featured.json?v=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error();featured=await res.json();}catch{featured=[]}try{const res=await fetch(`album-art.json?v=${Date.now()}`,{cache:'no-store'});if(!res.ok)throw new Error();albumArt=await res.json();}catch{albumArt=[]}renderHomeCategories();renderMusicPage();renderFeatured();setPageBackground('home');}
-$('#homeButton').onclick=()=>{setPageBackground('home');show('homeView')};$('#musicButton').onclick=()=>{setPageBackground('home');show('musicView')};$('#brandHome').onclick=e=>{e.preventDefault();setPageBackground('home');show('homeView')};
-$('#playButton').onclick=()=>{if(!audio.src&&queue.length)playQueue(0);else if(audio.paused)audio.play().catch(()=>{});else audio.pause()};$('#nextButton').onclick=next;$('#previousButton').onclick=previous;$('#shuffleButton').onclick=()=>{shuffle=!shuffle;$('#shuffleButton').classList.toggle('active',shuffle)};$('#repeatButton').onclick=()=>{repeat=!repeat;updatePlayButton()};$('#surpriseButton').onclick=()=>{if(queue.length)playQueue(Math.floor(Math.random()*queue.length))};
-$('#volume').oninput=e=>audio.volume=Number(e.target.value);audio.volume=.8;$('#progress').oninput=e=>{if(audio.duration)audio.currentTime=audio.duration*(Number(e.target.value)/100)};audio.ontimeupdate=()=>{$('#progress').value=audio.duration?audio.currentTime/audio.duration*100:0;$('#currentTime').textContent=formatTime(audio.currentTime)};audio.onloadedmetadata=()=>$('#duration').textContent=formatTime(audio.duration);audio.onplay=updatePlayButton;audio.onpause=updatePlayButton;audio.onended=next;
-$('#backButton').onclick=()=>{setPageBackground('home');show('homeView')};$('#tracksBackButton').onclick=()=>{setPageBackground('home');show('homeView');openHomeCategory(currentCategory)};$('#favoritesBackButton').onclick=()=>{setPageBackground('home');show('homeView')};$('#favoritesButton').onclick=()=>{renderFavorites();setPageBackground('home');show('favoritesView')};
-window.addEventListener('keydown',e=>{if(e.code==='Space'&&e.target.tagName!=='INPUT'){e.preventDefault();$('#playButton').click()}if(e.key==='ArrowRight'&&e.target.tagName!=='INPUT')next();if(e.key==='ArrowLeft'&&e.target.tagName!=='INPUT')previous()});
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+const $ = s => document.querySelector(s);
+const audio = $('#audio');
+
+const DEFAULT_ALBUM_ART = [
+  'assets/album-art/albumart1.png',
+  'assets/album-art/albumart2.png',
+  'assets/album-art/albumart3.jpeg',
+  'assets/album-art/albumart4.png',
+  'assets/album-art/albumart5.png',
+  'assets/album-art/albumart6.png'
+];
+
+let tracks = [], featured = [], albumArt = [...DEFAULT_ALBUM_ART];
+let currentIndex = -1, currentCategory = null, currentTheme = null, queue = [];
+let favorites = new Set(JSON.parse(localStorage.getItem('playsound-favorites') || '[]'));
+let shuffle = false, repeat = false;
+let activeBgLayer = 'A', currentBgUrl = '';
+
+const pretty = s => s.replace(/[-_]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+const categoryById = id => CATEGORIES.find(c => c.id === id);
+const filenameVariants = s => [String(s), String(s).replace(/-/g, ' '), String(s).replace(/\s+/g, '-'), String(s).replace(/&/g, 'and'), String(s).replace(/&/g, ' and ')];
+
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function assetCandidates(category, theme, type) {
+  return [...new Set(filenameVariants(theme).flatMap(v => [
+    `music/${category}/genre background/${type}/${v}.png`,
+    `music/${category}/genre background/${type}/${v}.jpeg`,
+    `music/${category}/genre background/${v}.png`,
+    `music/${category}/genre background/${v}.jpeg`
+  ]))];
+}
+
+function websiteBackgroundCandidates(category, theme) {
+  return [...new Set(filenameVariants(theme).flatMap(v => ['png', 'jpeg', 'jpg', 'webp'].flatMap(ext => [
+    `music/${category}/genre background/genre button backgrounds/website background/${v}.${ext}`,
+    `music/${category}/genre background/genre button backgrounds/website backgrounds/${v}.${ext}`,
+    `music/${category}/genre background/website background/${v}.${ext}`,
+    `music/${category}/genre background/website backgrounds/${v}.${ext}`
+  ])))];
+}
+
+function categoryCandidates(category, type) {
+  return [...new Set(filenameVariants(category).flatMap(v => ['png', 'jpeg', 'jpg', 'webp'].map(ext => `music/${category}/genre background/${type}/${v}.${ext}`)))];
+}
+
+function crossfadeBackground(url) {
+  if (!url || url === currentBgUrl) return;
+  currentBgUrl = url;
+  const nextLayer = $(activeBgLayer === 'A' ? '#bgLayerB' : '#bgLayerA');
+  const curLayer = $(activeBgLayer === 'A' ? '#bgLayerA' : '#bgLayerB');
+  if (!nextLayer || !curLayer) return;
+
+  const img = new Image();
+  img.onload = () => {
+    nextLayer.style.backgroundImage = `url("${url}")`;
+    nextLayer.classList.add('active');
+    curLayer.classList.remove('active');
+    activeBgLayer = activeBgLayer === 'A' ? 'B' : 'A';
+  };
+  img.src = url;
+}
+
+function setBackgroundCandidates(candidates) {
+  let i = 0;
+  const urls = [...new Set(candidates)];
+  const test = () => {
+    if (i >= urls.length) return;
+    const url = urls[i++];
+    const img = new Image();
+    img.onload = () => {
+      crossfadeBackground(url);
+    };
+    img.onerror = test;
+    img.src = url;
+  };
+  test();
+}
+
+function setBackground(category, theme) {
+  setBackgroundCandidates(websiteBackgroundCandidates(category, theme));
+}
+
+function setPageBackground(page) {
+  setBackgroundCandidates([`backgrounds/${page}.png`, `./backgrounds/${page}.png`]);
+}
+
+function setCategoryBackground(category) {
+  setBackgroundCandidates([
+    ...categoryCandidates(category, 'genre button backgrounds/website background'),
+    ...categoryCandidates(category, 'genre button backgrounds/website backgrounds'),
+    ...categoryCandidates(category, 'website background'),
+    ...categoryCandidates(category, 'website backgrounds')
+  ]);
+}
+
+function show(id) {
+  document.querySelectorAll('.view').forEach(v => {
+    v.hidden = v.id !== id;
+    v.classList.toggle('active', v.id === id);
+  });
+  document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+  if (id === 'homeView') $('#homeButton')?.classList.add('active');
+  if (['musicView', 'detailView', 'tracksView'].includes(id)) $('#musicButton')?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buttonStyle(category, theme) {
+  const candidates = assetCandidates(category, theme, 'genre button backgrounds');
+  return `style="--card-bg:url('${candidates[0]}')" data-bg-candidates="${encodeURIComponent(JSON.stringify(candidates))}"`;
+}
+
+function categoryButtonStyle(category) {
+  const candidates = categoryCandidates(category, 'genre button backgrounds');
+  return `style="--card-bg:url('${candidates[0]}')" data-bg-candidates="${encodeURIComponent(JSON.stringify(candidates))}"`;
+}
+
+function bindBackgroundFallbacks() {
+  document.querySelectorAll('[data-bg-candidates]').forEach(el => {
+    let candidates;
+    try {
+      candidates = JSON.parse(decodeURIComponent(el.dataset.bgCandidates));
+    } catch {
+      return;
+    }
+    let i = 0;
+    const test = () => {
+      if (i >= candidates.length) return;
+      const img = new Image();
+      img.onload = () => el.style.setProperty('--card-bg', `url("${candidates[i]}")`);
+      img.onerror = () => { i++; test(); };
+      img.src = candidates[i];
+    };
+    test();
+  });
+}
+
+function renderCategories(target = '#categoryGrid', onChoose = openCategory) {
+  const el = $(target);
+  if (!el) return;
+  el.innerHTML = CATEGORIES.map(c => `<button class="category-card" data-category="${c.id}" ${categoryButtonStyle(c.id)}><strong>${c.title}</strong></button>`).join('');
+  bindBackgroundFallbacks();
+  el.querySelectorAll('[data-category]').forEach(b => b.onclick = () => onChoose(b.dataset.category));
+}
+
+function renderMusicPage() {
+  renderCategories('#musicCategoryGrid');
+}
+
+function renderHomeCategories() {
+  renderCategories('#homeCategoryGrid', openHomeCategory);
+}
+
+function renderFeatured() {
+  const section = $('#featuredSection'), list = $('#featuredList');
+  if (!featured.length) {
+    section.hidden = true;
+    list.innerHTML = '';
+    return;
+  }
+  section.hidden = false;
+  list.innerHTML = featured.map((t, i) => trackHTML(t, i)).join('');
+  document.querySelectorAll('#featuredList [data-play]').forEach(b => b.onclick = () => {
+    queue = featured;
+    playQueue(Number(b.dataset.play));
+  });
+  document.querySelectorAll('#featuredList [data-favorite]').forEach(b => b.onclick = () => toggleFavorite(b.dataset.favorite));
+}
+
+function openCategory(id) {
+  currentCategory = id;
+  const c = categoryById(id);
+  if (!c) return;
+  setCategoryBackground(id);
+  $('#detailEyebrow').textContent = 'Choose a sound';
+  $('#detailTitle').textContent = c.title;
+  $('#detailDescription').textContent = c.description;
+  $('#themeGrid').innerHTML = c.themes.map(([key, label]) => `<button class="theme-card" data-theme="${key}" ${buttonStyle(id, key)}><strong>${label}</strong></button>`).join('');
+  bindBackgroundFallbacks();
+  document.querySelectorAll('#themeGrid [data-theme]').forEach(b => b.onclick = () => openTheme(id, b.dataset.theme));
+  show('detailView');
+}
+
+function openHomeCategory(id) {
+  currentCategory = id;
+  const c = categoryById(id);
+  if (!c) return;
+  setCategoryBackground(id);
+  $('#homeThemeEyebrow').textContent = c.title;
+  $('#homeThemeTitle').textContent = 'Sounds';
+  const section = $('#homeThemeSection');
+  section.hidden = false;
+  $('#homeThemeGrid').innerHTML = c.themes.map(([key, label]) => `<button class="theme-card" data-theme="${key}" ${buttonStyle(id, key)}><strong>${label}</strong></button>`).join('');
+  bindBackgroundFallbacks();
+  $('#homeThemeGrid').querySelectorAll('[data-theme]').forEach(b => b.onclick = () => openTheme(id, b.dataset.theme));
+  section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openTheme(category, theme) {
+  currentCategory = category;
+  currentTheme = theme;
+  const c = categoryById(category);
+  const label = c.themes.find(x => x[0] === theme)?.[1] || pretty(theme);
+  queue = tracks.filter(t => t.category === category && t.theme === theme);
+  if (!queue.length) queue = tracks.filter(t => t.category === category && t.theme === 'general');
+  setBackground(category, theme);
+  $('#tracksEyebrow').textContent = c.title;
+  $('#tracksTitle').textContent = label;
+  const badge = $('#trackCountBadge');
+  if (badge) badge.textContent = queue.length ? `${queue.length} track${queue.length === 1 ? '' : 's'}` : '';
+  renderTracks();
+  show('tracksView');
+}
+
+function renderTracks() {
+  const list = $('#trackList');
+  if (!queue.length) {
+    list.innerHTML = `<div class="empty"><strong>No music here yet.</strong><span>Drop an MP3 and matching artwork into <b>music/${currentCategory}/${currentTheme}/</b>, push it to GitHub, and the app will find it automatically.</span></div>`;
+    return;
+  }
+  list.innerHTML = queue.map((t, i) => trackHTML(t, i)).join('');
+  bindTrackButtons();
+}
+
+function artworkFor(t) {
+  if (t.artwork && !t.artwork.startsWith('artwork/') && !t.artwork.toLowerCase().endsWith('.mp3')) return t.artwork;
+  const pool = albumArt.length ? albumArt : DEFAULT_ALBUM_ART;
+  if (!pool.length) return '';
+  if (t._albumArt) return t._albumArt;
+  const idx = hashString(t.id || t.title || t.audio || '') % pool.length;
+  t._albumArt = pool[idx];
+  return t._albumArt;
+}
+
+function trackHTML(t, i) {
+  const fav = favorites.has(t.id), artwork = artworkFor(t);
+  return `<article class="track">
+    <div class="track-art">${artwork ? `<img class="track-art" src="${artwork}" alt="" loading="lazy" onerror="this.onerror=null;this.src='assets/album-art/albumart1.png'">` : '♪'}</div>
+    <div class="track-info">
+      <strong>${escapeHtml(t.title)}</strong>
+      <span>${pretty(t.theme || t.category || 'sound')}</span>
+    </div>
+    <div class="track-actions">
+      <button class="small-button" data-play="${i}" aria-label="Play ${escapeHtml(t.title)}">▶</button>
+      <button class="small-button" data-favorite="${t.id}" aria-label="${fav ? 'Remove from' : 'Add to'} favorites">${fav ? '♥' : '♡'}</button>
+    </div>
+  </article>`;
+}
+
+function bindTrackButtons() {
+  document.querySelectorAll('#trackList [data-play]').forEach(b => b.onclick = () => playQueue(Number(b.dataset.play)));
+  document.querySelectorAll('#trackList [data-favorite]').forEach(b => b.onclick = () => toggleFavorite(b.dataset.favorite));
+}
+
+function playQueue(i) {
+  if (!queue.length) return;
+  currentIndex = i;
+  loadTrack(queue[currentIndex], true);
+}
+
+function updateMediaSession(t, artwork) {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: t.title,
+    artist: 'PlaySound',
+    album: pretty(t.category || 'Everyday Moments'),
+    artwork: artwork ? [{ src: artwork, sizes: '512x512', type: 'image/png' }] : []
+  });
+  navigator.mediaSession.setActionHandler('play', () => audio.play().catch(() => {}));
+  navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+  navigator.mediaSession.setActionHandler('previoustrack', previous);
+  navigator.mediaSession.setActionHandler('nexttrack', next);
+  try {
+    navigator.mediaSession.setActionHandler('seekto', details => {
+      if (details.seekTime && audio.duration) audio.currentTime = details.seekTime;
+    });
+  } catch {}
+}
+
+function loadTrack(t, autoplay = false) {
+  if (!t) return;
+  const artwork = artworkFor(t);
+  audio.src = t.audio;
+  $('#playerTitle').textContent = t.title;
+  const img = $('#playerArtwork');
+  if (artwork) {
+    img.src = artwork;
+    img.onerror = () => { img.src = DEFAULT_ALBUM_ART[0]; };
+    img.hidden = false;
+    $('#playerNote').hidden = true;
+  } else {
+    img.hidden = true;
+    $('#playerNote').hidden = false;
+  }
+  if (autoplay) {
+    const p = audio.play();
+    if (p !== undefined) {
+      p.catch(err => {
+        console.log('Playback interaction required or paused:', err);
+        updatePlayButton();
+      });
+    }
+  }
+  updatePlayButton();
+  updateMediaSession(t, artwork);
+}
+
+function next() {
+  if (!queue.length) return;
+  if (repeat) {
+    loadTrack(queue[currentIndex < 0 ? 0 : currentIndex], true);
+    return;
+  }
+  currentIndex = shuffle ? Math.floor(Math.random() * queue.length) : (currentIndex + 1) % queue.length;
+  loadTrack(queue[currentIndex], true);
+}
+
+function previous() {
+  if (!queue.length) return;
+  currentIndex = (currentIndex - 1 + queue.length) % queue.length;
+  loadTrack(queue[currentIndex], true);
+}
+
+function toggleFavorite(id) {
+  if (favorites.has(id)) favorites.delete(id);
+  else favorites.add(id);
+  localStorage.setItem('playsound-favorites', JSON.stringify([...favorites]));
+  if (!$('#favoritesView').hidden) renderFavorites();
+  renderTracks();
+  renderFeatured();
+}
+
+function renderFavorites() {
+  const list = $('#favoriteList'), items = tracks.filter(t => favorites.has(t.id));
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><strong>No favorites yet.</strong><span>Tap ♡ next to any song to save it here.</span></div>';
+    return;
+  }
+  list.innerHTML = items.map(t => trackHTML(t, items.indexOf(t))).join('');
+  document.querySelectorAll('#favoriteList [data-play]').forEach(b => b.onclick = () => {
+    queue = items;
+    playQueue(Number(b.dataset.play));
+  });
+  document.querySelectorAll('#favoriteList [data-favorite]').forEach(b => b.onclick = () => toggleFavorite(b.dataset.favorite));
+}
+
+function updatePlayButton() {
+  $('#playButton').textContent = audio.paused ? '▶' : 'Ⅱ';
+  $('#playButton').setAttribute('aria-label', audio.paused ? 'Play' : 'Pause');
+  $('#repeatButton').classList.toggle('active', repeat);
+  $('#repeatButton').textContent = repeat ? '↻¹' : '↻';
+}
+
+function updateVolumeUI() {
+  const muteBtn = $('#muteButton');
+  if (muteBtn) {
+    muteBtn.textContent = (audio.muted || audio.volume === 0) ? '🔇' : '🔊';
+  }
+}
+
+function formatTime(s) {
+  if (!Number.isFinite(s)) return '0:00';
+  return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>'"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[c]));
+}
+
+async function loadManifest() {
+  try {
+    const res = await fetch(`tracks.json?v=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    tracks = data.map(t => {
+      if (t.artwork && (t.artwork.startsWith('artwork/') || t.artwork.toLowerCase().endsWith('.mp3'))) {
+        t.artwork = null;
+      }
+      return t;
+    });
+  } catch {
+    tracks = [];
+  }
+  try {
+    const res = await fetch(`featured.json?v=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error();
+    featured = await res.json();
+  } catch {
+    featured = [];
+  }
+  try {
+    const res = await fetch(`album-art.json?v=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error();
+    const fetchedArt = await res.json();
+    if (Array.isArray(fetchedArt) && fetchedArt.length) {
+      albumArt = fetchedArt;
+    }
+  } catch {
+    albumArt = [...DEFAULT_ALBUM_ART];
+  }
+  renderHomeCategories();
+  renderMusicPage();
+  renderFeatured();
+  setPageBackground('home');
+}
+
+// Navigation Events
+$('#homeButton').onclick = () => { setPageBackground('home'); show('homeView'); };
+$('#musicButton').onclick = () => { setPageBackground('home'); show('musicView'); };
+$('#brandHome').onclick = e => { e.preventDefault(); setPageBackground('home'); show('homeView'); };
+
+// Controls Events
+$('#playButton').onclick = () => {
+  if (!audio.src && queue.length) playQueue(0);
+  else if (audio.paused) audio.play().catch(() => {});
+  else audio.pause();
+};
+$('#nextButton').onclick = next;
+$('#previousButton').onclick = previous;
+$('#shuffleButton').onclick = () => {
+  shuffle = !shuffle;
+  $('#shuffleButton').classList.toggle('active', shuffle);
+};
+$('#repeatButton').onclick = () => {
+  repeat = !repeat;
+  updatePlayButton();
+};
+$('#surpriseButton').onclick = () => {
+  if (queue.length) playQueue(Math.floor(Math.random() * queue.length));
+};
+$('#playAllButton').onclick = () => {
+  if (queue.length) playQueue(0);
+};
+
+$('#muteButton').onclick = () => {
+  audio.muted = !audio.muted;
+  updateVolumeUI();
+};
+
+$('#volume').oninput = e => {
+  audio.volume = Number(e.target.value);
+  if (audio.muted && audio.volume > 0) audio.muted = false;
+  updateVolumeUI();
+};
+audio.volume = 0.8;
+
+$('#progress').oninput = e => {
+  if (audio.duration) audio.currentTime = audio.duration * (Number(e.target.value) / 100);
+};
+
+audio.ontimeupdate = () => {
+  $('#progress').value = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+  $('#currentTime').textContent = formatTime(audio.currentTime);
+};
+audio.onloadedmetadata = () => $('#duration').textContent = formatTime(audio.duration);
+audio.onplay = updatePlayButton;
+audio.onpause = updatePlayButton;
+
+// Continuous Autoplay when a track ends
+audio.onended = () => {
+  next();
+};
+
+$('#backButton').onclick = () => { setPageBackground('home'); show('homeView'); };
+$('#tracksBackButton').onclick = () => { setPageBackground('home'); show('homeView'); openHomeCategory(currentCategory); };
+$('#favoritesBackButton').onclick = () => { setPageBackground('home'); show('homeView'); };
+$('#favoritesButton').onclick = () => { renderFavorites(); setPageBackground('home'); show('favoritesView'); };
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+    e.preventDefault();
+    $('#playButton').click();
+  }
+  if (e.key === 'ArrowRight' && e.target.tagName !== 'INPUT') next();
+  if (e.key === 'ArrowLeft' && e.target.tagName !== 'INPUT') previous();
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+
 loadManifest();
