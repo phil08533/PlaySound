@@ -865,7 +865,7 @@ button {
   .playlist-actions { flex-wrap: wrap; }
   .download-playlist-button { flex: 1 1 auto; }
   .delete-playlist-button { flex: 0 0 auto; }
-  .download-tip { left: 0; bottom: calc(100% + 10px); }
+  .download-tip { width: min(330px, 100%); }
   .secondary-button {
     align-self: flex-start;
   }
@@ -916,8 +916,8 @@ button {
 .download-playlist-button.is-downloaded { background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,246,239,.96)); }
 .delete-playlist-button { min-height: 38px; padding: 7px 13px; font-size: .88rem; color: #a95655; border-color: rgba(224,135,122,.35); }
 .delete-playlist-button:hover { color: #923f43; background: rgba(255,241,237,.96); }
-.download-tip { position: absolute; z-index: 8; left: 0; bottom: calc(100% + 12px); width: min(330px, calc(100vw - 52px)); display: flex; align-items: flex-start; gap: 10px; padding: 13px 14px; border: 1px solid rgba(255,255,255,.95); border-radius: 18px; background: rgba(255,252,247,.97); color: #51406e; box-shadow: 0 12px 30px rgba(60,42,68,.18); font-size: .88rem; line-height: 1.4; opacity: 0; transform: translateY(9px) scale(.96); transform-origin: bottom left; transition: opacity .24s ease, transform .28s cubic-bezier(.2,.85,.25,1.25); pointer-events: none; }
-.download-tip:after { content: ""; position: absolute; left: 28px; bottom: -8px; width: 14px; height: 14px; background: inherit; border-right: 1px solid rgba(255,255,255,.95); border-bottom: 1px solid rgba(255,255,255,.95); transform: rotate(45deg); }
+.download-tip { position: relative; z-index: 2; width: min(330px, calc(100vw - 52px)); display: flex; align-items: flex-start; gap: 10px; margin-top: 9px; padding: 13px 14px; border: 1px solid rgba(255,255,255,.95); border-radius: 18px; background: rgba(255,252,247,.97); color: #51406e; box-shadow: 0 12px 30px rgba(60,42,68,.18); font-size: .88rem; line-height: 1.4; opacity: 0; transform: translateY(8px) scale(.98); transform-origin: top left; transition: opacity .24s ease, transform .28s cubic-bezier(.2,.85,.25,1.25); pointer-events: none; }
+.download-tip:after { content: ""; position: absolute; left: 28px; top: -7px; width: 12px; height: 12px; background: inherit; border-left: 1px solid rgba(255,255,255,.95); border-top: 1px solid rgba(255,255,255,.95); transform: rotate(45deg); }
 .download-tip.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
 .download-tip button { flex: 0 0 28px; width: 28px; height: 28px; margin: -5px -6px 0 0; border: 0; border-radius: 50%; background: rgba(108,88,133,.1); color: #51406e; font-size: 1.25rem; line-height: 1; }
 .studio-card { background: linear-gradient(135deg, rgba(255,247,232,.92), rgba(255,239,231,.9)); border: 1px solid rgba(239,174,130,.35); }
