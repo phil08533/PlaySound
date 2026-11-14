@@ -20,6 +20,9 @@ const DEFAULT_ALBUM_ART = [
 let tracks = [], featured = [], albumArt = [...DEFAULT_ALBUM_ART];
 let currentIndex = -1, currentCategory = null, currentTheme = null, queue = [];
 let favorites = new Set(JSON.parse(localStorage.getItem('playsound-favorites') || '[]'));
+const DOWNLOAD_CACHE = 'playsound-playlist-downloads-v1';
+const DOWNLOADS_KEY = 'playsound-downloaded-playlists';
+let activePlaylistKey = '';
 let shuffle = false, repeat = false;
 let activeBgLayer = 'A', currentBgUrl = '';
 
@@ -217,6 +220,8 @@ function openTheme(category, theme) {
   const label = c.themes.find(x => x[0] === theme)?.[1] || pretty(theme);
   queue = tracks.filter(t => t.category === category && t.theme === theme);
   if (!queue.length) queue = tracks.filter(t => t.category === category && t.theme === 'general');
+  activePlaylistKey = playlistKey(category, theme);
+  updatePlaylistDownloadUI();
   setBackground(category, theme);
   $('#tracksEyebrow').textContent = c.title;
   $('#tracksTitle').textContent = label;
@@ -224,6 +229,102 @@ function openTheme(category, theme) {
   if (badge) badge.textContent = queue.length ? `${queue.length} track${queue.length === 1 ? '' : 's'}` : '';
   renderTracks();
   show('tracksView');
+}
+
+function playlistKey(category, theme) {
+  return `${category}::${theme}`;
+}
+
+function readDownloads() {
+  try { return JSON.parse(localStorage.getItem(DOWNLOADS_KEY) || '{}'); }
+  catch { return {}; }
+}
+
+function updatePlaylistDownloadUI() {
+  const downloadButton = $('#downloadPlaylistButton');
+  const deleteButton = $('#deletePlaylistButton');
+  if (!downloadButton || !deleteButton) return;
+  const isDownloaded = Boolean(activePlaylistKey && readDownloads()[activePlaylistKey]);
+  downloadButton.disabled = !queue.length;
+  downloadButton.textContent = isDownloaded ? '▶ Play All' : '↓ Download playlist';
+  downloadButton.setAttribute('aria-label', isDownloaded ? 'Play all downloaded songs' : 'Download this playlist for offline listening');
+  downloadButton.classList.toggle('is-downloaded', isDownloaded);
+  deleteButton.hidden = !isDownloaded;
+  deleteButton.disabled = !isDownloaded;
+  $('#playAllButton').hidden = isDownloaded;
+}
+
+function playlistAssetUrls(items) {
+  const urls = new Set();
+  items.forEach(track => {
+    if (track.audio) urls.add(new URL(track.audio, location.href).href);
+    const art = artworkFor(track);
+    if (art) urls.add(new URL(art, location.href).href);
+  });
+  DEFAULT_ALBUM_ART.forEach(path => urls.add(new URL(path, location.href).href));
+  return [...urls].filter(url => new URL(url).origin === location.origin);
+}
+
+async function downloadCurrentPlaylist() {
+  if (!queue.length || !activePlaylistKey) return;
+  const button = $('#downloadPlaylistButton');
+  const assets = playlistAssetUrls(queue);
+  const cache = await caches.open(DOWNLOAD_CACHE);
+  const stored = [];
+  button.disabled = true;
+  try {
+    for (let i = 0; i < assets.length; i++) {
+      const url = assets[i];
+      const request = new Request(url, { credentials: 'same-origin' });
+      let response = await cache.match(request);
+      if (!response) {
+        response = await fetch(request);
+        if (!response.ok) throw new Error(`Download failed: ${new URL(url).pathname}`);
+        await cache.put(request, response.clone());
+      }
+      stored.push(url);
+      button.textContent = `Downloading ${Math.round((i + 1) / assets.length * 100)}%`;
+    }
+    const downloads = readDownloads();
+    downloads[activePlaylistKey] = { urls: stored, count: queue.length, savedAt: Date.now() };
+    localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(downloads));
+    updatePlaylistDownloadUI();
+    if (!localStorage.getItem('playsound-download-tip-dismissed')) showDownloadTip();
+  } catch (error) {
+    console.error('Playlist download failed:', error);
+    window.alert('The playlist could not be fully downloaded. Check your connection and try again.');
+    updatePlaylistDownloadUI();
+  }
+}
+
+async function deleteCurrentPlaylistDownload() {
+  if (!activePlaylistKey) return;
+  const downloads = readDownloads();
+  const record = downloads[activePlaylistKey];
+  if (!record) return;
+  delete downloads[activePlaylistKey];
+  const stillNeeded = new Set(Object.values(downloads).flatMap(item => item.urls || []));
+  const cache = await caches.open(DOWNLOAD_CACHE);
+  for (const url of record.urls || []) {
+    if (!stillNeeded.has(url)) await cache.delete(url);
+  }
+  localStorage.setItem(DOWNLOADS_KEY, JSON.stringify(downloads));
+  updatePlaylistDownloadUI();
+}
+
+function showDownloadTip() {
+  const tip = $('#downloadTip');
+  if (!tip || localStorage.getItem('playsound-download-tip-dismissed')) return;
+  tip.hidden = false;
+  requestAnimationFrame(() => tip.classList.add('visible'));
+}
+
+function dismissDownloadTip() {
+  const tip = $('#downloadTip');
+  if (!tip) return;
+  tip.classList.remove('visible');
+  localStorage.setItem('playsound-download-tip-dismissed', '1');
+  window.setTimeout(() => { tip.hidden = true; }, 260);
 }
 
 function renderTracks() {
@@ -234,6 +335,7 @@ function renderTracks() {
   }
   list.innerHTML = queue.map((t, i) => trackHTML(t, i)).join('');
   bindTrackButtons();
+  updatePlaylistDownloadUI();
 }
 
 function artworkFor(t) {
@@ -445,6 +547,15 @@ $('#surpriseButton').onclick = () => {
 $('#playAllButton').onclick = () => {
   if (queue.length) playQueue(0);
 };
+$('#downloadPlaylistButton').onclick = () => {
+  if (readDownloads()[activePlaylistKey]) {
+    if (queue.length) playQueue(0);
+  } else {
+    downloadCurrentPlaylist();
+  }
+};
+$('#deletePlaylistButton').onclick = deleteCurrentPlaylistDownload;
+$('#dismissDownloadTip').onclick = dismissDownloadTip;
 
 $('#muteButton').onclick = () => {
   audio.muted = !audio.muted;
