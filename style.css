@@ -825,7 +825,9 @@ button {
     grid-template-columns: repeat(3, 1fr);
   }
   .topbar {
-    align-items: flex-start;
+    align-items: center;
+    padding-bottom: 14px;
+    gap: 12px;
   }
   .main-nav {
     flex-wrap: wrap;
@@ -856,7 +858,14 @@ button {
   .tracks-heading {
     align-items: flex-start;
     flex-direction: column;
+    gap: 14px;
+    margin-bottom: 18px;
   }
+  .playlist-download-wrap, .playlist-actions { width: 100%; }
+  .playlist-actions { flex-wrap: wrap; }
+  .download-playlist-button { flex: 1 1 auto; }
+  .delete-playlist-button { flex: 0 0 auto; }
+  .download-tip { left: 0; bottom: calc(100% + 10px); }
   .secondary-button {
     align-self: flex-start;
   }
@@ -883,6 +892,9 @@ button {
   .brand-mark {
     font-size: 2.3rem;
   }
+  .topbar { gap: 8px; padding-bottom: 10px; }
+  .main-nav { gap: 2px; }
+  .nav-button { font-size: .9rem; }
   .nav-button {
     padding: 7px 10px;
   }
@@ -896,3 +908,29 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Playlist downloads */
+.playlist-download-wrap { position: relative; display: flex; flex-direction: column; align-items: flex-start; }
+.playlist-actions { display: flex; align-items: center; gap: 9px; }
+.download-playlist-button { min-height: 46px; }
+.download-playlist-button.is-downloaded { background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,246,239,.96)); }
+.delete-playlist-button { min-height: 38px; padding: 7px 13px; font-size: .88rem; color: #a95655; border-color: rgba(224,135,122,.35); }
+.delete-playlist-button:hover { color: #923f43; background: rgba(255,241,237,.96); }
+.download-tip { position: absolute; z-index: 8; left: 0; bottom: calc(100% + 12px); width: min(330px, calc(100vw - 52px)); display: flex; align-items: flex-start; gap: 10px; padding: 13px 14px; border: 1px solid rgba(255,255,255,.95); border-radius: 18px; background: rgba(255,252,247,.97); color: #51406e; box-shadow: 0 12px 30px rgba(60,42,68,.18); font-size: .88rem; line-height: 1.4; opacity: 0; transform: translateY(9px) scale(.96); transform-origin: bottom left; transition: opacity .24s ease, transform .28s cubic-bezier(.2,.85,.25,1.25); pointer-events: none; }
+.download-tip:after { content: ""; position: absolute; left: 28px; bottom: -8px; width: 14px; height: 14px; background: inherit; border-right: 1px solid rgba(255,255,255,.95); border-bottom: 1px solid rgba(255,255,255,.95); transform: rotate(45deg); }
+.download-tip.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.download-tip button { flex: 0 0 28px; width: 28px; height: 28px; margin: -5px -6px 0 0; border: 0; border-radius: 50%; background: rgba(108,88,133,.1); color: #51406e; font-size: 1.25rem; line-height: 1; }
+.studio-card { background: linear-gradient(135deg, rgba(255,247,232,.92), rgba(255,239,231,.9)); border: 1px solid rgba(239,174,130,.35); }
+.studio-badge, .legal-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; margin-bottom: 6px; background: rgba(238,134,110,.14); color: #a75d56; font-size: .75rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.legal-card h3 { margin: 20px 0 6px; font-family: var(--font-heading); color: #382c4d; font-size: 1.25rem; }
+.legal-note { margin-top: 14px !important; font-size: .88rem !important; }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+button:active { transform: scale(.975); }
+.track, .about-card, .category-card, .theme-card, .nav-button, .secondary-button, .small-button, .icon-button, .play-button { transition-timing-function: cubic-bezier(.2,.8,.2,1); }
+.track { transition: transform .22s ease, box-shadow .22s ease, background .22s ease; }
+.small-button, .icon-button { transition: transform .18s ease, background-color .18s ease, color .18s ease; }
+.small-button:active, .icon-button:active { transform: scale(.88); }
+.play-button:active { transform: scale(.92); }
+.about-card { animation: card-enter .42s cubic-bezier(.22,.8,.28,1) both; }
+@keyframes soft-pop { 0% { opacity: 0; transform: translateY(9px) scale(.94); } 70% { transform: translateY(-2px) scale(1.015); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+.download-tip.visible { animation: soft-pop .34s cubic-bezier(.2,.8,.2,1) both; }
