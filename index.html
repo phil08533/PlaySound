@@ -72,6 +72,12 @@
           <p>PlaySound is proudly affiliated with <a href="https://portal-music.com" target="_blank" rel="noopener noreferrer" class="portal-link"><strong>portal-music.com</strong> ↗</a>, creating intentional, mindful audio environments designed to bring calm and inspiration to daily routines.</p>
         </div>
 
+        <div class="about-card studio-card">
+          <div class="studio-badge">Created by</div>
+          <h2>Developed by Blork Studios</h2>
+          <p>PlaySound is an independent project from Blork Studios.</p>
+        </div>
+
         <div class="about-card donate-card">
           <div class="donate-badge">Support PlaySound</div>
           <h2>Keep it free & ad-free</h2>
@@ -85,6 +91,15 @@
             </a>
           </div>
         </div>
+
+        <section class="about-card legal-card" aria-labelledby="legalTitle">
+          <div class="legal-badge">Privacy &amp; legal</div>
+          <h2 id="legalTitle">A little about your data</h2>
+          <p>PlaySound does not require an account. Favorites are saved in your browser's local storage. Playlists you download are saved on this device for offline listening and can be removed at any time. Your browser may send standard connection information to the website host when loading music and artwork.</p>
+          <h3>Using PlaySound</h3>
+          <p>PlaySound is provided for personal and family listening. Please do not redistribute the app, music, or artwork unless you have the necessary rights or permission. Music and artwork remain subject to their respective owners' rights.</p>
+          <p class="legal-note">This summary is general product information, not legal advice. A fuller policy may be needed if the app adds analytics, accounts, advertising, or other data collection.</p>
+        </section>
 
         <div class="about-card features-card">
           <div class="feature-item">
@@ -125,10 +140,20 @@
     <section id="tracksView" class="view" hidden>
       <button id="tracksBackButton" class="back-button" type="button">← Back</button>
       <div class="tracks-heading">
-        <div>
+        <div class="tracks-title-block">
           <p id="tracksEyebrow" class="eyebrow"></p>
           <h2 id="tracksTitle"></h2>
           <span id="trackCountBadge" class="track-count-badge"></span>
+        </div>
+        <div class="playlist-download-wrap">
+          <div class="playlist-actions">
+            <button id="downloadPlaylistButton" class="secondary-button download-playlist-button" type="button">↓ Download playlist</button>
+            <button id="deletePlaylistButton" class="secondary-button delete-playlist-button" type="button" hidden>♲ Delete</button>
+          </div>
+          <div id="downloadTip" class="download-tip" role="status" hidden>
+            <span>Need to free up space? Delete and redownload at any time!</span>
+            <button id="dismissDownloadTip" type="button" aria-label="Dismiss tip">×</button>
+          </div>
         </div>
         <div class="tracks-actions">
           <button id="playAllButton" class="secondary-button" type="button">▶ Play All</button>
