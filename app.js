@@ -324,7 +324,7 @@ function dismissDownloadTip() {
   if (!tip) return;
   tip.classList.remove('visible');
   localStorage.setItem('playsound-download-tip-dismissed', '1');
-  window.setTimeout(() => { tip.hidden = true; }, 260);
+  window.setTimeout(() => { tip.hidden = true; }, 340);
 }
 
 function renderTracks() {
