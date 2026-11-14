@@ -1,4 +1,4 @@
-const CACHE='playsound-v8';
+const CACHE='playsound-v9';
 const SHELL=['./','./index.html','./style.css','./fresh-manifest.js','./app.js','./car-ride-fix.js','./ui-polish.js','./manifest.json','./assets/icon.svg'];
 
 self.addEventListener('install',e=>e.waitUntil(
